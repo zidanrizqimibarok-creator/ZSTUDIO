@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CENTER R&Z</title>
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+    <style>
+        :root { --danger: #ff4757; --success: #2ed573; --dark: #2f3542; }
+        body { font-family: sans-serif; background: #1e2124; color: white; margin: 0; padding-bottom: 50px; }
+        .status-bar { background: var(--danger); padding: 10px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; font-size: 13px; }
+        .container { padding: 15px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #36393e; color: white; font-weight: bold; }
+        .tab-btn.active { background: var(--danger); }
+        .order-card { background: #36393e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--success); animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+        .detail-box { background: #2f3136; padding: 10px; border-radius: 8px; font-size: 14px; color: #00ff00; margin: 10px 0; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; background: var(--success); color: white; cursor: pointer; }
+        .stock-item { display: flex; justify-content: space-between; align-items: center; background: #36393e; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .btn-toggle { padding: 8px 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-on { background: var(--success); color: white; }
+        .btn-off { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="status" class="status-bar">MENGHUBUNGKAN...</div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-order" onclick="showTab('order')">📥 PESANAN</button>
+            <button class="tab-btn" id="tab-stock" onclick="showTab('stock')">🚫 STOK MENU</button>
+        </div>
+
+        <div id="section-order">
+            <div id="list-pesanan"><p style="text-align:center; opacity:0.5;">Belum ada pesanan...</p></div>
+        </div>
+
+        <div id="section-stock" style="display:none;">
+            <div id="stock-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const ably = new Ably.Realtime('_5uX1A.i3oY3Q:-F3Wm3iLu9vzEUXraD6HVdeHjh_pxk7pEqyzCGwNhsg');
+        const channel = ably.channels.get('warung-rz');
+
+        const allMenus = [
+            {id:1, n:"Bakso Beranak", p:10000}, {id:2, n:"Bakso Telur", p:10000}, {id:3, n:"Bakso Keju", p:10000},
+            {id:4, n:"Mie Bakso", p:10000}, {id:5, n:"Mie Ayam", p:10000}, {id:6, n:"Soteng", p:10000},
+            {id:7, n:"Kupat Tahu", p:10000}, {id:8, n:"Siomay", p:10000}, {id:9, n:"Kebab", p:10000},
+            {id:10, n:"Lumpia Basah", p:10000}, {id:11, n:"Mie Jebew", p:5000}, {id:12, n:"Batagorr", p:5000},
+            {id:13, n:"Burger", p:5000}, {id:14, n:"Wonton", p:5000}, {id:15, n:"Cordog Sosis", p:3000},
+            {id:16, n:"Cordog Moza", p:3000}, {id:17, n:"Dimsum Keju", p:2500}, {id:18, n:"Ayam Keju", p:2500},
+            {id:19, n:"Bola Bola Rambutan", p:2500}, {id:20, n:"Dimsum", p:2000}, {id:21, n:"Lumpia Ayam", p:2000},
+            {id:22, n:"Sempol", p:2000}, {id:23, n:"Es Teler Hemat", p:5000}, {id:24, n:"Es Teler Mantap", p:10000},
+            {id:25, n:"Es Teler Jumbo", p:20000}, {id:26, n:"Es Lilin Duren", p:1000}, {id:101, n:"Es Tea Jus", p:1000},
+            {id:102, n:"Pop Ice", p:3000}, {id:103, n:"Nutrisari Jeruk", p:3000}
+        ];
+
+        let soldOutItems = JSON.parse(localStorage.getItem('soldOut')) || [];
+
+        ably.connection.on('connected', () => {
+            document.getElementById('status').innerText = "✅ CENTER AKTIF";
+            document.getElementById('status').style.background = "var(--success)";
+            syncStock();
+        });
+
+        // Kirim info stok ke pembeli
+        function syncStock() {
+            channel.publish('update-stok', { soldOut: soldOutItems });
+        }
+
+        channel.subscribe('pesanan-baru', (message) => {
+            const data = message.data;
+            const msgId = message.id;
+            const list = document.getElementById('list-pesanan');
+            if(list.querySelector('p')) list.innerHTML = '';
+
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <b>${data.nama} <small>(${data.metode})</small></b><br>
+                <small>📍 ${data.alamat}</small>
+                <div class="detail-box">${data.detail}</div>
+                <div style="margin-bottom:10px">Total: <b>Rp ${data.total.toLocaleString()}</b></div>
+                <div id="act-${msgId}">
+                    <button class="btn-action" onclick="proses('${msgId}', ${data.total})">TERIMA & KONFIRMASI</button>
+                </div>
+            `;
+            list.prepend(card);
+            new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
+        });
+
+        window.proses = (id, total) => {
+            let ong = prompt("Ongkir:", "3000");
+            let note = prompt("Note:", "Siap, pesanan diproses!");
+            if (ong !== null) {
+                channel.publish('update-status', { id: id, status: "DITERIMA", ongkir: parseInt(ong), total: total, note: note });
+                document.getElementById('act-'+id).innerHTML = "✅ TERKIRIM";
+            }
+        }
+
+        function toggleStock(id) {
+            if (soldOutItems.includes(id)) soldOutItems = soldOutItems.filter(i => i !== id);
+            else soldOutItems.push(id);
+            localStorage.setItem('soldOut', JSON.stringify(soldOutItems));
+            syncStock();
+            renderStock();
+        }
+
+        function renderStock() {
+            const container = document.getElementById('stock-list');
+            container.innerHTML = '<h3>Atur Stok</h3>';
+            allMenus.forEach(m => {
+                const isOff = soldOutItems.includes(m.id);
+                container.innerHTML += `
+                    <div class="stock-item">
+                        <span>${m.n}</span>
+                        <button class="btn-toggle ${isOff ? 'btn-off' : 'btn-on'}" onclick="toggleStock(${m.id})">
+                            ${isOff ? 'HABIS' : 'ADA'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function showTab(t) {
+            document.getElementById('section-order').style.display = t === 'order' ? 'block' : 'none';
+            document.getElementById('section-stock').style.display = t === 'stock' ? 'block' : 'none';
+            document.getElementById('tab-order').className = 'tab-btn ' + (t === 'order' ? 'active' : '');
+            document.getElementById('tab-stock').className = 'tab-btn ' + (t === 'stock' ? 'active' : '');
+            if(t==='stock') renderStock();
+        }
+    </script>
+</body>
+</html>
