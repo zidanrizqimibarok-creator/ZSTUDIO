@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIZET OS v4.6 ULTIMATE</title>
+    <title>BIZET OS v4.7 FINAL</title>
     <style>
-        :root {
-            --ios-blue: #007aff;
-            --ios-bg: #f2f2f7;
-            --bizet-red: #ff3b30;
-        }
-
-        body, html {
+        :root { --ios-blue: #007aff; --bizet-red: #ff3b30; }
+        body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: -apple-system, system-ui, sans-serif;
-            background: #000; overflow: hidden; color: white;
+            font-family: -apple-system, sans-serif; background: #000; overflow: hidden; color: white;
         }
 
+        /* WALLPAPER */
         #wallpaper {
             position: fixed; inset: 0; z-index: -1;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
                         url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');
             background-size: cover; background-position: center;
         }
 
-        /* --- DYNAMIC ISLAND --- */
-        #dynamic-island {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            min-width: 150px; height: 35px; background: #000; border-radius: 20px;
+        /* DYNAMIC ISLAND */
+        #island {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            min-width: 140px; height: 35px; background: #000; border-radius: 20px;
             z-index: 50000; display: flex; align-items: center; justify-content: center;
-            padding: 0 20px; transition: all 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
-            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0 20px; border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
-        #dynamic-island.active { width: 350px; height: 80px; background: #000; }
+        #island.active { width: 350px; height: 70px; background: #111; }
 
-        /* --- HOME SCREEN --- */
+        /* HOME SCREEN */
         #home { height: 100vh; display: flex; flex-direction: column; align-items: center; opacity: 0; transition: 1s; }
-        .app-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-top: 180px; width: 85%; }
+        .app-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 150px; width: 90%; }
         
-        .app-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; width: 110px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; width: 100px; }
         .icon {
-            width: 85px; height: 85px; border-radius: 22px; background: #fff;
+            width: 75px; height: 75px; border-radius: 20px; background: #fff;
             display: flex; justify-content: center; align-items: center;
-            margin-bottom: 10px; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            margin-bottom: 10px; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
-        .app-item:hover .icon { transform: scale(1.1); }
-
-        /* --- DELETE & EDIT MODE --- */
         .del-badge {
             position: absolute; top: -5px; left: -5px; width: 25px; height: 25px;
             background: red; color: white; border-radius: 50%; display: none;
@@ -54,42 +46,40 @@
         }
         .editing .del-badge { display: flex; }
 
-        /* --- PANEL SYSTEM --- */
+        /* PANELS */
         .panel {
             position: fixed; top: 100%; left: 0; width: 100%; height: 100%;
-            background: var(--ios-bg); color: #000; z-index: 10000;
-            transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); overflow-y: auto;
+            background: #f2f2f7; color: #000; z-index: 10000; transition: 0.5s; overflow-y: auto;
         }
         .panel.active { top: 0; }
-        .header { padding: 80px 40px 20px; font-size: 2.5rem; font-weight: 800; }
+        .header { padding: 60px 30px 20px; font-size: 2.5rem; font-weight: 800; }
 
-        /* --- EASTER EGG PORTAL --- */
-        #portal {
-            position: fixed; inset: 0; background: #000; z-index: 99999;
-            display: none; justify-content: center; align-items: center;
+        /* NO SIGNAL SCREEN */
+        #no-signal {
+            position: fixed; inset: 0; background: #000; z-index: 999999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            font-family: 'Courier New', monospace;
         }
-        .ring {
-            width: 250px; height: 250px; border: 5px solid red; border-radius: 50%;
-            border-top-color: transparent; animation: spin 0.5s linear infinite;
-            box-shadow: 0 0 50px red;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- WEBVIEW --- */
+        /* WEBVIEW */
         #web-layer { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); padding: 15px 50px; border-radius: 50px; background: #fff; border: none; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <audio id="snd" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
 
-    <div id="dynamic-island"><div id="clock">00:00</div></div>
+    <div id="island"><div id="clock">--:--</div></div>
 
-    <div id="boot" style="position:fixed; inset:0; background:#000; z-index:88888; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-        <h1 style="letter-spacing:15px; font-weight:200;">BIZET OS</h1>
-        <button onclick="bootNow()" style="margin-top:20px; padding:15px 45px; background:red; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">MASUK SISTEM</button>
+    <div id="no-signal">
+        <div style="background:#fff; color:#000; padding:10px 40px; font-weight:bold; font-size:2rem;">NO SIGNAL</div>
+        <p style="color:#444; margin-top:20px;">BIZET OS AUTOMATIC LOCK: 21:53</p>
+    </div>
+
+    <div id="boot" style="position:fixed; inset:0; background:#000; z-index:90000; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <h1 style="letter-spacing:10px;">BIZET OS</h1>
+        <button onclick="bootNow()" style="margin-top:20px; padding:15px 40px; background:red; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">BOOT SYSTEM</button>
     </div>
 
     <div id="wallpaper"></div>
@@ -97,136 +87,137 @@
     <div id="home">
         <div class="app-grid" id="main-grid">
             <div class="app-item" onclick="openWeb('https://www.google.com')">
-                <div class="icon"><img src="https://www.google.com/favicon.ico" width="40"></div>
+                <div class="icon"><img src="https://www.google.com/favicon.ico" width="35"></div>
                 <span>Google</span>
             </div>
             <div class="app-item" onclick="openPanel('store-panel')">
-                <div class="icon" style="background: linear-gradient(#4cd964, #28a745); color:white; font-size:2.5rem;">📥</div>
+                <div class="icon" style="background: linear-gradient(#4cd964, #28a745); color:white; font-size:2rem;">📥</div>
                 <span>App Store</span>
             </div>
-            <div class="app-item" onclick="openWeb('https://www.sharedrop.io/')">
-                <div class="icon" style="background: #5AC8FA; color:white; font-size:2.5rem;">📱</div>
-                <span>Mirror Hub</span>
+            <div class="app-item" onclick="openPanel('gallery-panel')">
+                <div class="icon" style="background: var(--ios-blue); color:white; font-size:2rem;">🖼️</div>
+                <span>Gallery</span>
             </div>
             <div class="app-item" onclick="openPanel('settings-panel')">
-                <div class="icon" style="background: #8e8e93; color:white; font-size:2.5rem;">⚙️</div>
+                <div class="icon" style="background: #8e8e93; color:white; font-size:2rem;">⚙️</div>
                 <span>Settings</span>
             </div>
             <div class="app-item" id="edit-btn" onclick="toggleEdit()">
-                <div class="icon" style="background: #333; color:white; font-size:2.5rem;">🛠️</div>
-                <span id="edit-label">Edit App</span>
+                <div class="icon" style="background: #333; color:white; font-size:1.8rem;">🛠️</div>
+                <span id="edit-label">Edit</span>
             </div>
+        </div>
+    </div>
+
+    <div id="gallery-panel" class="panel">
+        <div class="header">Gallery</div>
+        <div style="padding:0 30px;">
+            <input type="file" id="f-in" style="display:none" onchange="imgOut(event)">
+            <button onclick="document.getElementById('f-in').click()" style="padding:15px 30px; background:var(--ios-blue); color:#fff; border:none; border-radius:12px;">Pilih Gambar dari USB</button>
+            <button onclick="closePanel('gallery-panel')" style="padding:15px 30px; background:#ddd; border:none; border-radius:12px;">Tutup</button>
+            <br><img id="pre" style="width:100%; border-radius:15px; margin-top:20px; display:none;">
         </div>
     </div>
 
     <div id="store-panel" class="panel">
         <div class="header">App Store</div>
-        <div style="padding: 0 40px;">
-            <p>Tambah aplikasi web ke Home Screen Bos.</p>
-            <input type="text" id="new-name" placeholder="Nama Aplikasi" style="width:100%; padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #ccc;">
-            <input type="text" id="new-url" placeholder="URL (https://...)" style="width:100%; padding:15px; margin-bottom:20px; border-radius:12px; border:1px solid #ccc;">
-            <button onclick="addNewApp()" style="width:100%; padding:18px; background:var(--ios-blue); color:white; border:none; border-radius:12px; font-weight:bold;">INSTAL SEKARANG</button>
-            <button onclick="closePanel('store-panel')" style="width:100%; padding:15px; background:#ddd; margin-top:10px; border:none; border-radius:12px;">BATAL</button>
+        <div style="padding:0 30px;">
+            <input type="text" id="app-n" placeholder="Nama App" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;">
+            <input type="text" id="app-u" placeholder="https://..." style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;">
+            <button onclick="addApp()" style="width:100%; padding:15px; background:var(--ios-blue); color:#fff; border:none; border-radius:10px;">Instal</button>
+            <button onclick="closePanel('store-panel')" style="width:100%; padding:15px; background:#ddd; border:none; border-radius:10px; margin-top:10px;">Batal</button>
         </div>
     </div>
 
     <div id="settings-panel" class="panel">
         <div class="header">Settings</div>
-        <div style="background:white; margin:20px; border-radius:20px;">
-            <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;" onclick="eggTrigger()">
-                <span>Sistem Version</span> <b style="color:var(--ios-blue)">BIZET OS 4.6 PRO ></b>
+        <div style="background:#fff; margin:20px; border-radius:15px;">
+            <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;" onclick="egg()">
+                <span>Versi OS</span> <b style="color:var(--ios-blue)">BIZET OS 4.7 ></b>
             </div>
         </div>
-        <button onclick="closePanel('settings-panel')" style="margin:40px; padding:15px 40px; background:#000; color:#fff; border:none; border-radius:12px;">TUTUP</button>
-    </div>
-
-    <div id="portal" onclick="this.style.display='none'">
-        <div class="ring"></div>
-        <h1 style="position:absolute; color:red; letter-spacing:10px;">HYPER RED</h1>
+        <button onclick="closePanel('settings-panel')" style="margin:20px; padding:15px 30px;">Kembali</button>
     </div>
 
     <div id="web-layer">
-        <button class="close-btn" onclick="closeWeb()">EXIT</button>
+        <button onclick="closeWeb()" style="position:fixed; bottom:30px; left:50%; transform:translateX(-50%); padding:15px 40px; border-radius:50px; border:none; background:#fff; font-weight:bold; z-index:9001;">EXIT</button>
         <iframe id="view"></iframe>
     </div>
 
     <script>
-        let editMode = false;
-        let eggCount = 0;
+        let isEdit = false;
 
-        function updateTime() {
+        function clock() {
             const d = new Date();
-            document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            const h = d.getHours();
+            const m = d.getMinutes();
+            const timeStr = h.toString().padStart(2,'0') + ":" + m.toString().padStart(2,'0');
+            document.getElementById('clock').innerText = timeStr;
+
+            // NO SIGNAL TRIGGER (21:53)
+            if (h === 21 && m === 53) {
+                document.getElementById('no-signal').style.display = 'flex';
+            }
         }
-        setInterval(updateTime, 1000);
+        setInterval(clock, 1000); clock();
 
         function bootNow() {
             if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
             document.getElementById('boot').style.display = 'none';
             document.getElementById('home').style.opacity = '1';
-            updateTime();
         }
 
         function openPanel(id) { document.getElementById(id).classList.add('active'); }
         function closePanel(id) { document.getElementById(id).classList.remove('active'); }
-        function openWeb(url) { document.getElementById('view').src = url; document.getElementById('web-layer').style.display = 'block'; }
+        function openWeb(u) { document.getElementById('view').src = u; document.getElementById('web-layer').style.display = 'block'; }
         function closeWeb() { document.getElementById('web-layer').style.display = 'none'; document.getElementById('view').src = ''; }
 
-        // TAMBAH APP ASLI
-        function addNewApp() {
-            const name = document.getElementById('new-name').value;
-            const url = document.getElementById('new-url').value;
-            if(!name || !url) return alert("Isi semua data!");
+        function imgOut(e) {
+            const img = document.getElementById('pre');
+            img.src = URL.createObjectURL(e.target.files[0]);
+            img.style.display = 'block';
+            notif("MEDIA LOADED FROM USB");
+        }
 
+        function addApp() {
+            const n = document.getElementById('app-n').value;
+            const u = document.getElementById('app-u').value;
+            if(!n || !u) return;
             const grid = document.getElementById('main-grid');
             const div = document.createElement('div');
             div.className = 'app-item';
-            div.onclick = () => openWeb(url);
-            div.innerHTML = `<div class="icon" style="background:#eee; color:#333; font-weight:bold; font-size:2rem;">${name[0]}</div><span>${name}</span>`;
-            
+            div.onclick = () => openWeb(u);
+            div.innerHTML = `<div class="icon" style="background:#eee; font-weight:bold; font-size:1.5rem; color:#333;">${n[0]}</div><span>${n}</span>`;
             grid.insertBefore(div, document.getElementById('edit-btn'));
-            
-            // Notif Dynamic Island
-            document.getElementById('snd').play();
-            const island = document.getElementById('dynamic-island');
-            const clock = document.getElementById('clock');
-            island.classList.add('active');
-            clock.innerHTML = "✅ APP INSTALLED: " + name.toUpperCase();
-            
-            setTimeout(() => {
-                island.classList.remove('active');
-                setTimeout(updateTime, 600);
-            }, 3000);
-
+            notif("APP INSTALLED: " + n.toUpperCase());
             closePanel('store-panel');
         }
 
-        // HAPUS APP
         function toggleEdit() {
-            editMode = !editMode;
-            const apps = document.querySelectorAll('.app-item');
-            apps.forEach(app => {
-                if(app.id !== 'edit-btn') {
-                    if(!app.querySelector('.del-badge')) {
-                        const b = document.createElement('div');
-                        b.className = 'del-badge'; b.innerText = '-';
-                        b.onclick = (e) => { e.stopPropagation(); app.remove(); };
-                        app.appendChild(b);
+            isEdit = !isEdit;
+            document.querySelectorAll('.app-item').forEach(a => {
+                if(a.id !== 'edit-btn') {
+                    if(!a.querySelector('.del-badge')) {
+                        const b = document.createElement('div'); b.className = 'del-badge'; b.innerText = '-';
+                        b.onclick = (e) => { e.stopPropagation(); a.remove(); }; a.appendChild(b);
                     }
-                    app.classList.toggle('editing', editMode);
+                    a.classList.toggle('editing', isEdit);
                 }
             });
-            document.getElementById('edit-label').innerText = editMode ? "Done" : "Edit App";
+            document.getElementById('edit-label').innerText = isEdit ? "Done" : "Edit";
         }
 
-        // EASTER EGG TRIGGER
-        function eggTrigger() {
-            eggCount++;
-            if(eggCount >= 3) {
-                document.getElementById('portal').style.display = 'flex';
-                eggCount = 0;
-            }
+        function notif(t) {
+            document.getElementById('snd').play();
+            const i = document.getElementById('island');
+            const c = document.getElementById('clock');
+            i.classList.add('active');
+            c.innerText = t;
+            setTimeout(() => { i.classList.remove('active'); setTimeout(clock, 600); }, 3000);
         }
+
+        let eC = 0;
+        function egg() { eC++; if(eC >= 3) { alert("BIZET OS 4.7 FINAL\nHYPER-RED EDITION\nNO SIGNAL ENGINE: ON"); eC = 0; } }
     </script>
 </body>
 </html>
