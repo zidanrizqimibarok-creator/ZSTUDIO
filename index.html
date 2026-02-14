@@ -2,114 +2,230 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>BIZET OS v1.0 DIRECT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIZET OS v4.6 ULTIMATE</title>
     <style>
         :root {
-            --bizet-red: #ff0000;
-            --bg-dark: #050505;
+            --ios-blue: #007aff;
+            --ios-bg: #f2f2f7;
+            --bizet-red: #ff3b30;
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); color: white;
-            font-family: 'Segoe UI', sans-serif; overflow: hidden;
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #000; overflow: hidden; color: white;
         }
 
-        /* WALLPAPER VIBRANT RINGAN */
-        #bg {
+        #wallpaper {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at top right, #1a0000, #000);
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover; background-position: center;
         }
 
-        /* BOOTING SUPER RINGAN */
-        #boot {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
+        /* --- DYNAMIC ISLAND --- */
+        #dynamic-island {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            min-width: 150px; height: 35px; background: #000; border-radius: 20px;
+            z-index: 50000; display: flex; align-items: center; justify-content: center;
+            padding: 0 20px; transition: all 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        #dynamic-island.active { width: 350px; height: 80px; background: #000; }
+
+        /* --- HOME SCREEN --- */
+        #home { height: 100vh; display: flex; flex-direction: column; align-items: center; opacity: 0; transition: 1s; }
+        .app-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-top: 180px; width: 85%; }
+        
+        .app-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; width: 110px; }
+        .icon {
+            width: 85px; height: 85px; border-radius: 22px; background: #fff;
             display: flex; justify-content: center; align-items: center;
+            margin-bottom: 10px; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
-        .boot-txt {
-            font-size: 5rem; font-weight: 900; color: var(--bizet-red);
-            letter-spacing: 15px; animation: pulse 2.5s forwards;
-        }
-        @keyframes pulse { 0% { opacity:0; } 50% { opacity:1; } 100% { opacity:0; } }
+        .app-item:hover .icon { transform: scale(1.1); }
 
-        /* HOME UI */
-        #main {
-            height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
+        /* --- DELETE & EDIT MODE --- */
+        .del-badge {
+            position: absolute; top: -5px; left: -5px; width: 25px; height: 25px;
+            background: red; color: white; border-radius: 50%; display: none;
+            justify-content: center; align-items: center; font-weight: bold;
         }
-        .clock { font-size: 8rem; font-weight: 900; margin: 0; }
-        .date { font-size: 1.2rem; color: #888; letter-spacing: 3px; margin-bottom: 30px; }
+        .editing .del-badge { display: flex; }
 
-        /* GRID SISTEM */
-        .grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 15px; width: 80%; max-width: 1000px;
+        /* --- PANEL SYSTEM --- */
+        .panel {
+            position: fixed; top: 100%; left: 0; width: 100%; height: 100%;
+            background: var(--ios-bg); color: #000; z-index: 10000;
+            transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); overflow-y: auto;
         }
-        .app {
-            height: 100px; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-            text-decoration: none; color: white;
-        }
-        .app:hover { background: var(--bizet-red); transform: scale(1.05); }
+        .panel.active { top: 0; }
+        .header { padding: 80px 40px 20px; font-size: 2.5rem; font-weight: 800; }
 
-        /* GATE SCREEN */
-        #gate {
-            position: fixed; inset: 0; background: #000; z-index: 9000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
+        /* --- EASTER EGG PORTAL --- */
+        #portal {
+            position: fixed; inset: 0; background: #000; z-index: 99999;
+            display: none; justify-content: center; align-items: center;
         }
-        .btn { padding: 20px 50px; background: var(--bizet-red); border: none; color: white; font-weight: 900; border-radius: 10px; cursor: pointer; }
+        .ring {
+            width: 250px; height: 250px; border: 5px solid red; border-radius: 50%;
+            border-top-color: transparent; animation: spin 0.5s linear infinite;
+            box-shadow: 0 0 50px red;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- WEBVIEW --- */
+        #web-layer { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .close-btn { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); padding: 15px 50px; border-radius: 50px; background: #fff; border: none; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="bg"></div>
+    <audio id="snd" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
 
-    <div id="boot"><div class="boot-txt">BIZET</div></div>
+    <div id="dynamic-island"><div id="clock">00:00</div></div>
 
-    <div id="gate">
-        <button class="btn" onclick="goFull()">START BIZET OS (AUTO FULLSCREEN)</button>
+    <div id="boot" style="position:fixed; inset:0; background:#000; z-index:88888; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <h1 style="letter-spacing:15px; font-weight:200;">BIZET OS</h1>
+        <button onclick="bootNow()" style="margin-top:20px; padding:15px 45px; background:red; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">MASUK SISTEM</button>
     </div>
 
-    <div id="main">
-        <h1 class="clock" id="c">00:00</h1>
-        <p class="date" id="d">SABTU, 14 FEB 2026</p>
+    <div id="wallpaper"></div>
 
-        <div class="grid">
-            <a href="https://www.tiktok.com" class="app">TIKTOK</a>
-            <a href="https://m.youtube.com" class="app">YOUTUBE</a>
-            <a href="https://poki.com" class="app">GAMES</a>
-            <a href="https://dutamovie21.ink" class="app">DUTAMOVIE21</a>
-            <a href="https://www.google.com" class="app">GOOGLE</a>
-            <div class="app" onclick="location.reload()">REBOOT</div>
-            <div class="app" onclick="alert('BIZET OS v1.0\nStatus: Direct Link Mode')">INFO</div>
-            <div class="app" style="color:red" onclick="window.close()">OFF</div>
+    <div id="home">
+        <div class="app-grid" id="main-grid">
+            <div class="app-item" onclick="openWeb('https://www.google.com')">
+                <div class="icon"><img src="https://www.google.com/favicon.ico" width="40"></div>
+                <span>Google</span>
+            </div>
+            <div class="app-item" onclick="openPanel('store-panel')">
+                <div class="icon" style="background: linear-gradient(#4cd964, #28a745); color:white; font-size:2.5rem;">📥</div>
+                <span>App Store</span>
+            </div>
+            <div class="app-item" onclick="openWeb('https://www.sharedrop.io/')">
+                <div class="icon" style="background: #5AC8FA; color:white; font-size:2.5rem;">📱</div>
+                <span>Mirror Hub</span>
+            </div>
+            <div class="app-item" onclick="openPanel('settings-panel')">
+                <div class="icon" style="background: #8e8e93; color:white; font-size:2.5rem;">⚙️</div>
+                <span>Settings</span>
+            </div>
+            <div class="app-item" id="edit-btn" onclick="toggleEdit()">
+                <div class="icon" style="background: #333; color:white; font-size:2.5rem;">🛠️</div>
+                <span id="edit-label">Edit App</span>
+            </div>
         </div>
     </div>
 
+    <div id="store-panel" class="panel">
+        <div class="header">App Store</div>
+        <div style="padding: 0 40px;">
+            <p>Tambah aplikasi web ke Home Screen Bos.</p>
+            <input type="text" id="new-name" placeholder="Nama Aplikasi" style="width:100%; padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #ccc;">
+            <input type="text" id="new-url" placeholder="URL (https://...)" style="width:100%; padding:15px; margin-bottom:20px; border-radius:12px; border:1px solid #ccc;">
+            <button onclick="addNewApp()" style="width:100%; padding:18px; background:var(--ios-blue); color:white; border:none; border-radius:12px; font-weight:bold;">INSTAL SEKARANG</button>
+            <button onclick="closePanel('store-panel')" style="width:100%; padding:15px; background:#ddd; margin-top:10px; border:none; border-radius:12px;">BATAL</button>
+        </div>
+    </div>
+
+    <div id="settings-panel" class="panel">
+        <div class="header">Settings</div>
+        <div style="background:white; margin:20px; border-radius:20px;">
+            <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;" onclick="eggTrigger()">
+                <span>Sistem Version</span> <b style="color:var(--ios-blue)">BIZET OS 4.6 PRO ></b>
+            </div>
+        </div>
+        <button onclick="closePanel('settings-panel')" style="margin:40px; padding:15px 40px; background:#000; color:#fff; border:none; border-radius:12px;">TUTUP</button>
+    </div>
+
+    <div id="portal" onclick="this.style.display='none'">
+        <div class="ring"></div>
+        <h1 style="position:absolute; color:red; letter-spacing:10px;">HYPER RED</h1>
+    </div>
+
+    <div id="web-layer">
+        <button class="close-btn" onclick="closeWeb()">EXIT</button>
+        <iframe id="view"></iframe>
+    </div>
+
     <script>
-        function update() {
+        let editMode = false;
+        let eggCount = 0;
+
+        function updateTime() {
             const d = new Date();
-            const days = ["MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
-            const months = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
-            document.getElementById('c').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-            document.getElementById('d').innerText = days[d.getDay()] + ", " + d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+            document.getElementById('clock').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
         }
-        setInterval(update, 1000); update();
+        setInterval(updateTime, 1000);
 
-        window.onload = () => {
+        function bootNow() {
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+            document.getElementById('boot').style.display = 'none';
+            document.getElementById('home').style.opacity = '1';
+            updateTime();
+        }
+
+        function openPanel(id) { document.getElementById(id).classList.add('active'); }
+        function closePanel(id) { document.getElementById(id).classList.remove('active'); }
+        function openWeb(url) { document.getElementById('view').src = url; document.getElementById('web-layer').style.display = 'block'; }
+        function closeWeb() { document.getElementById('web-layer').style.display = 'none'; document.getElementById('view').src = ''; }
+
+        // TAMBAH APP ASLI
+        function addNewApp() {
+            const name = document.getElementById('new-name').value;
+            const url = document.getElementById('new-url').value;
+            if(!name || !url) return alert("Isi semua data!");
+
+            const grid = document.getElementById('main-grid');
+            const div = document.createElement('div');
+            div.className = 'app-item';
+            div.onclick = () => openWeb(url);
+            div.innerHTML = `<div class="icon" style="background:#eee; color:#333; font-weight:bold; font-size:2rem;">${name[0]}</div><span>${name}</span>`;
+            
+            grid.insertBefore(div, document.getElementById('edit-btn'));
+            
+            // Notif Dynamic Island
+            document.getElementById('snd').play();
+            const island = document.getElementById('dynamic-island');
+            const clock = document.getElementById('clock');
+            island.classList.add('active');
+            clock.innerHTML = "✅ APP INSTALLED: " + name.toUpperCase();
+            
             setTimeout(() => {
-                document.getElementById('boot').style.display = 'none';
-                document.getElementById('gate').style.display = 'flex';
+                island.classList.remove('active');
+                setTimeout(updateTime, 600);
             }, 3000);
-        };
 
-        function goFull() {
-            const doc = document.documentElement;
-            if (doc.requestFullscreen) doc.requestFullscreen();
-            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
-            document.getElementById('gate').style.display = 'none';
+            closePanel('store-panel');
+        }
+
+        // HAPUS APP
+        function toggleEdit() {
+            editMode = !editMode;
+            const apps = document.querySelectorAll('.app-item');
+            apps.forEach(app => {
+                if(app.id !== 'edit-btn') {
+                    if(!app.querySelector('.del-badge')) {
+                        const b = document.createElement('div');
+                        b.className = 'del-badge'; b.innerText = '-';
+                        b.onclick = (e) => { e.stopPropagation(); app.remove(); };
+                        app.appendChild(b);
+                    }
+                    app.classList.toggle('editing', editMode);
+                }
+            });
+            document.getElementById('edit-label').innerText = editMode ? "Done" : "Edit App";
+        }
+
+        // EASTER EGG TRIGGER
+        function eggTrigger() {
+            eggCount++;
+            if(eggCount >= 3) {
+                document.getElementById('portal').style.display = 'flex';
+                eggCount = 0;
+            }
         }
     </script>
 </body>
