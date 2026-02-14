@@ -2,139 +2,71 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIZET OS v19.0 APEX OVERLORD</title>
+    <title>BIZET OS v20.0 CIPHER EDITION</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
     <style>
-        :root {
-            --red: #ff0000;
-            --dark: #000;
-            --neon: 0 0 25px rgba(255, 0, 0, 0.6);
-        }
+        :root { --red: #ff0000; --dark: #000; --neon: 0 0 30px rgba(255, 0, 0, 0.7); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--dark); color: white;
-            font-family: 'Segoe UI', sans-serif; overflow: hidden;
-        }
+        /* BOOTING CLEAN */
+        #boot { position: fixed; inset: 0; background: #000; z-index: 999999; display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 8rem; font-weight: 900; color: var(--red); letter-spacing: 25px; text-shadow: var(--neon); animation: pulse 3s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* --- BOOTING CLEAN (NO TEXT) --- */
-        #boot {
-            position: fixed; inset: 0; background: #000; z-index: 9999999;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .logo-apex {
-            font-size: 8rem; font-weight: 900; color: var(--red);
-            letter-spacing: 30px; text-shadow: var(--neon);
-            animation: pulse 4s ease-in-out forwards;
-        }
-        @keyframes pulse {
-            0% { opacity: 0; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.1); }
-        }
-
-        /* --- LAYER 1: DASHBOARD (HOME) --- */
-        #home-layer {
-            position: absolute; inset: 0; z-index: 10;
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 0 8%; background: radial-gradient(circle, #150000, #000);
-            transition: 1s ease-in-out;
-        }
+        /* DASHBOARD */
+        #home-layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; padding: 0 8%; transition: 1s; }
         .clock { font-size: 10rem; font-weight: 100; margin: 0; }
-        .welcome-msg { font-size: 1.5rem; letter-spacing: 10px; color: #555; text-transform: uppercase; }
+        .welcome { font-size: 1.5rem; letter-spacing: 10px; color: #444; text-transform: uppercase; }
 
-        /* --- LAYER 2: WEB ENGINE (BROWSER) --- */
-        #web-layer {
-            position: absolute; inset: 0; z-index: 5; /* Di bawah UI */
-            background: #000; display: none;
-        }
+        /* WEB LAYER */
+        #web-layer { position: absolute; inset: 0; z-index: 5; background: #000; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- LAYER 3: FLOATING UI (PINTASAN TIDAK AKAN HILANG) --- */
+        /* FLOATING UI (PINTASAN) */
         #floating-ui {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 99999; /* LAPISAN TERTINGGI, TIDAK BISA TERTUTUP WEB */
-            display: flex; gap: 20px; background: rgba(10,10,10,0.95);
-            padding: 15px 35px; border-radius: 50px;
-            border: 1px solid #333; backdrop-filter: blur(20px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9);
-            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 99999; display: flex; gap: 15px; background: rgba(10,10,10,0.95);
+            padding: 12px 30px; border-radius: 50px; border: 1px solid #333; backdrop-filter: blur(20px);
         }
-        .floating-ui.hide { transform: translateX(-50%) translateY(150px); opacity: 0; }
-
-        .btn-app {
-            width: 130px; height: 70px; background: #1a1a1a;
-            border-radius: 20px; border: 1px solid #444; color: white;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-            letter-spacing: 2px; font-size: 0.8rem;
-        }
+        .btn-app { width: 120px; height: 65px; background: #1a1a1a; border-radius: 18px; border: 1px solid #444; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.75rem; letter-spacing: 1px; }
         .btn-app:hover { background: var(--red); box-shadow: var(--neon); border-color: #fff; }
 
-        /* --- SETTINGS & SHUTDOWN --- */
-        #settings-overlay {
-            position: fixed; inset: 0; z-index: 999999;
-            background: rgba(0,0,0,0.98); display: none;
-            justify-content: center; align-items: center;
+        /* PAIRING CODE OVERLAY (PENGGANTI QR) */
+        #pairing-box {
+            position: fixed; top: 30px; right: 30px; background: rgba(20,20,20,0.9);
+            padding: 20px; border-radius: 20px; border: 1px solid #444; z-index: 100000;
+            text-align: center; backdrop-filter: blur(10px);
         }
-        .set-box {
-            width: 800px; height: 500px; background: #0c0c0c;
-            border-radius: 40px; border: 1px solid #222; display: flex;
-        }
-        .set-side { width: 30%; border-right: 1px solid #222; padding: 40px 20px; }
-        .set-main { flex: 1; padding: 50px; text-align: center; }
-        .s-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 15px; border: none; background: #181818; color: white; cursor: pointer; text-align: left; }
-        .s-btn:hover { background: var(--red); }
-        .qr-card { background: white; padding: 10px; border-radius: 15px; display: inline-block; margin-top: 20px; }
+        .code-text { font-family: monospace; font-size: 2rem; color: var(--red); font-weight: bold; letter-spacing: 5px; margin: 10px 0; }
 
-        /* EFFECT SHUTDOWN */
-        .crt-off { animation: crtEffect 0.7s forwards; }
-        @keyframes crtEffect {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.5, 0.002); filter: brightness(10); }
-            100% { transform: scale(0); opacity: 0; }
-        }
+        /* SHUTDOWN */
+        .off-anim { animation: off 0.6s forwards; }
+        @keyframes off { 0% { transform: scale(1); } 50% { transform: scale(1.5, 0.002); filter: brightness(10); } 100% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="boot">
-        <div class="logo-apex">BIZET</div>
+    <div id="boot"><div class="logo">BIZET</div></div>
+
+    <div id="pairing-box">
+        <div style="font-size: 0.7rem; color: #888; letter-spacing: 2px;">CONNECT CODE:</div>
+        <div class="code-text" id="sync-code">....</div>
+        <div id="conn-status" style="font-size: 0.6rem; color: #444;">WAITING...</div>
     </div>
 
     <div id="home-layer">
-        <p class="welcome-msg">Welcome to BIZET APEX v19</p>
-        <h1 class="clock" id="time-display">00:00</h1>
+        <p class="welcome">Apex Eternal v20</p>
+        <h1 class="clock" id="cl">00:00</h1>
     </div>
 
-    <div id="web-layer"><iframe id="main-frame" src=""></iframe></div>
+    <div id="web-layer"><iframe id="ifr" src=""></iframe></div>
 
     <div id="floating-ui">
-        <div class="btn-app" onclick="openApp('https://www.tiktok.com')">TIKTOK</div>
-        <div class="btn-app" onclick="openApp('https://m.youtube.com')">YOUTUBE</div>
-        <div class="btn-app" onclick="openApp('https://poki.com')">GAMES</div>
-        <div class="btn-app" style="border-color: red;" onclick="toggleSettings()">SETTING</div>
-    </div>
-
-    <div id="settings-overlay">
-        <div class="set-box">
-            <div class="set-side">
-                <button class="s-btn" onclick="backToHome()">🏠 HOME SCREEN</button>
-                <button class="s-btn" onclick="location.reload()">🔄 REBOOT OS</button>
-                <button class="s-btn" style="background:#400" onclick="shutdownTV()">🔴 SHUTDOWN</button>
-            </div>
-            <div class="set-main">
-                <h1 style="color:red; margin:0; letter-spacing:10px;">APEX OVERLORD</h1>
-                <p style="color:#444">Version 19.0 | Ultimate Layering System</p>
-                <hr style="border:0; border-top:1px solid #222; margin:30px 0;">
-                <p>SCAN UNTUK KONSOL REMOT:</p>
-                <div class="qr-card" id="qr-place"></div>
-            </div>
-        </div>
+        <div class="btn-app" onclick="openA('https://www.tiktok.com')">TIKTOK</div>
+        <div class="btn-app" onclick="openA('https://m.youtube.com')">YOUTUBE</div>
+        <div class="btn-app" onclick="openA('https://poki.com')">GAMES</div>
+        <div class="btn-app" style="border-color: red;" onclick="off()">OFF</div>
     </div>
 
     <script>
@@ -142,83 +74,60 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- SISTEM JAM ---
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('time-display').innerText = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-        }
-        setInterval(updateTime, 1000); updateTime();
+        // 1. GENERATE PAIRING CODE (Contoh: BZ-7788)
+        const myPairCode = "BZ-" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('sync-code').innerText = myPairCode;
 
-        // --- ANIMASI BOOTING ---
+        // 2. SISTEM JAM
+        function clock() {
+            const d = new Date();
+            document.getElementById('cl').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+        }
+        setInterval(clock, 1000); clock();
+
+        // 3. BOOTING
         setTimeout(() => {
-            const boot = document.getElementById('boot');
-            boot.style.transition = '2s'; boot.style.opacity = '0';
-            setTimeout(() => boot.style.display = 'none', 2000);
+            const b = document.getElementById('boot');
+            b.style.transition = '2s'; b.style.opacity = '0';
+            setTimeout(() => b.style.display = 'none', 2000);
         }, 5000);
 
-        // --- NAVIGASI CORE ---
-        function openApp(url) {
-            const frame = document.getElementById('main-frame');
-            frame.src = url;
+        // 4. NAVIGATION
+        function openA(url) {
+            document.getElementById('ifr').src = url;
             document.getElementById('web-layer').style.display = 'block';
             document.getElementById('home-layer').style.opacity = '0';
-            document.getElementById('floating-ui').classList.add('hide'); // Sembunyikan bar
         }
 
-        function backToHome() {
-            document.getElementById('web-layer').style.display = 'none';
-            document.getElementById('main-frame').src = '';
-            document.getElementById('home-layer').style.opacity = '1';
-            document.getElementById('floating-ui').classList.remove('hide');
-            document.getElementById('settings-overlay').style.display = 'none';
+        function off() {
+            document.body.classList.add('off-anim');
+            setTimeout(() => { document.body.innerHTML = ''; }, 600);
         }
 
-        function toggleSettings() {
-            const s = document.getElementById('settings-overlay');
-            s.style.display = (s.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function shutdownTV() {
-            document.getElementById('settings-overlay').style.display = 'none';
-            document.body.classList.add('crt-off');
-            setTimeout(() => { document.body.innerHTML = ''; }, 700);
-        }
-
-        // Munculkan Bar Pintasan saat Mouse ke bawah layar
-        window.addEventListener('mousemove', (e) => {
-            if(e.clientY > window.innerHeight - 100) {
-                document.getElementById('floating-ui').classList.remove('hide');
-            }
-        });
-
-        // --- QR GENERATOR ---
-        new QRCode(document.getElementById("qr-place"), {
-            text: window.location.href.replace('bizet_os.html', 'remote.html'),
-            width: 160, height: 160
-        });
-
-        // --- LISTENER REMOTE TERBARU (CODE & DPAD) ---
-        // 1. Jalur Navigasi (D-Pad)
-        db.ref('BIZET_REMOTE_DPAD').on('value', (snap) => {
-            const cmd = snap.val();
-            if(!cmd) return;
-            if(cmd === 'UP') window.scrollBy(0, -300);
-            if(cmd === 'DOWN') window.scrollBy(0, 300);
-            if(cmd === 'HOME') backToHome();
-            if(cmd === 'BACK') { try { document.getElementById('main-frame').contentWindow.history.back(); } catch(e) { backToHome(); } }
-            db.ref('BIZET_REMOTE_DPAD').set(null);
-        });
-
-        // 2. Jalur Konsol (Input Code/URL)
-        db.ref('BIZET_TITANIUM_SYNC').on('value', (snap) => {
+        // 5. RECEIVER (Hanya jalan jika kode di Remote HP COCOK)
+        db.ref('BIZET_GLOBAL_SYNC').on('value', (snap) => {
             const data = snap.val();
             if(!data) return;
-            if(data.type === 'url') openApp(data.val);
-            if(data.type === 'code') {
-                document.getElementById('web-layer').style.display = 'block';
-                document.getElementById('main-frame').srcdoc = data.val;
+
+            // CEK APAKAH KODE DARI HP SAMA DENGAN DI TV
+            if(data.pairKey === myPairCode) {
+                document.getElementById('conn-status').innerText = "CONNECTED";
+                document.getElementById('conn-status').style.color = "lime";
+
+                if(data.type === 'nav') {
+                    if(data.val === 'UP') window.scrollBy(0, -300);
+                    if(data.val === 'DOWN') window.scrollBy(0, 300);
+                    if(data.val === 'HOME') {
+                        document.getElementById('web-layer').style.display = 'none';
+                        document.getElementById('ifr').src = '';
+                        document.getElementById('home-layer').style.opacity = '1';
+                    }
+                }
+                if(data.type === 'url') openA(data.val);
+                
+                // Clear trigger setelah diproses
+                db.ref('BIZET_GLOBAL_SYNC').set(null);
             }
-            db.ref('BIZET_TITANIUM_SYNC').set(null);
         });
     </script>
 </body>
