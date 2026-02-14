@@ -2,151 +2,192 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>BIZET OS v1.0 ULTRA CHROMA</title>
+    <title>BIZET OS v1.0 PREMIUM CHROMA</title>
     <style>
         :root {
-            --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
-            --bg: #000;
+            --bizet-red: #ff0000;
+            --g-blue: #4285F4; --g-yellow: #FBBC05; --g-green: #34A853;
         }
 
-        /* MOUSE AKTIF */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--bg); color: white;
-            font-family: 'Product Sans', Arial, sans-serif;
+            background: #000; color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             overflow: hidden; cursor: default;
         }
 
-        /* --- 1. BOOTING GOOGLE STYLE --- */
+        /* --- 1. PREMIUM MESH BACKGROUND --- */
+        #bg-canvas {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 20% 30%, #1a0000 0%, #000 50%),
+                        radial-gradient(circle at 80% 70%, #00001a 0%, #000 100%);
+            filter: contrast(120%);
+        }
+
+        /* --- 2. BIZET SINGLE DOT BOOTING --- */
         #boot {
             position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; justify-content: center; align-items: center; gap: 15px;
+            display: flex; justify-content: center; align-items: center;
         }
-        .dot { width: 30px; height: 30px; border-radius: 50%; animation: jump 1.5s infinite; }
-        .d1 { background: var(--g-blue); animation-delay: 0.1s; }
-        .d2 { background: var(--g-red); animation-delay: 0.2s; }
-        .d3 { background: var(--g-yellow); animation-delay: 0.3s; }
-        .d4 { background: var(--g-green); animation-delay: 0.4s; }
-        @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-50px); } }
+        .bizet-ball {
+            width: 60px; height: 60px; background: var(--bizet-red);
+            border-radius: 50%; box-shadow: 0 0 50px var(--bizet-red);
+            animation: bizetMove 4s infinite ease-in-out;
+        }
+        @keyframes bizetMove {
+            0% { transform: scale(1); filter: hue-rotate(0deg); }
+            25% { transform: scale(1.5) translateX(-50px); background: var(--g-blue); box-shadow: 0 0 50px var(--g-blue); }
+            50% { transform: scale(1) translateX(0); background: var(--g-yellow); box-shadow: 0 0 50px var(--g-yellow); }
+            75% { transform: scale(1.5) translateX(50px); background: var(--g-green); box-shadow: 0 0 50px var(--g-green); }
+            100% { transform: scale(1); filter: hue-rotate(360deg); }
+        }
 
-        /* --- 2. FULLSCREEN GATE (SEBELUM HOME) --- */
+        /* --- 3. FULLSCREEN GATE --- */
         #gate {
-            position: fixed; inset: 0; background: #111; z-index: 9000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center;
         }
         .gate-btn {
-            padding: 20px 60px; font-size: 1.5rem; font-weight: bold;
-            background: linear-gradient(45deg, var(--g-blue), var(--g-red));
-            border: none; color: white; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s;
+            padding: 25px 60px; font-size: 1.8rem; font-weight: 900;
+            background: var(--bizet-red); border: none; color: white;
+            border-radius: 20px; cursor: pointer; transition: 0.4s;
+            box-shadow: 0 0 30px rgba(255,0,0,0.4);
         }
-        .gate-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
 
-        /* --- 3. DASHBOARD CHROMA --- */
+        /* --- 4. DYNAMIC ISLAND (CLOCK & DATE) --- */
+        #dynamic-island {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid #333; padding: 10px 30px;
+            border-radius: 50px; display: none; align-items: center; gap: 20px;
+            z-index: 99999; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #dynamic-island:hover { width: 400px; } /* Efek melebar kalau didekati mouse */
+        .island-txt { font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; }
+
+        /* --- 5. DASHBOARD --- */
         #dashboard {
             height: 100vh; display: flex; flex-direction: column;
             justify-content: center; align-items: center; opacity: 0; transition: 1s;
         }
-        .clock { font-size: 10rem; font-weight: bold; background: linear-gradient(to right, #4285F4, #EA4335, #FBBC05, #34A853); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .main-clock { font-size: 11rem; font-weight: 900; margin: 0; letter-spacing: -8px; color: white; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
         
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-top: 30px; }
         .app {
-            width: 200px; height: 110px; border-radius: 20px; border: 2px solid #222;
+            width: 210px; height: 120px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center; font-weight: bold;
-            background: rgba(255,255,255,0.05); transition: 0.3s; cursor: pointer;
+            transition: 0.3s; cursor: pointer; letter-spacing: 2px;
         }
-        /* WARNA WARNI GOOGLE */
-        .app:nth-child(1):hover { border-color: var(--g-blue); box-shadow: 0 0 20px var(--g-blue); }
-        .app:nth-child(2):hover { border-color: var(--g-red); box-shadow: 0 0 20px var(--g-red); }
-        .app:nth-child(3):hover { border-color: var(--g-yellow); box-shadow: 0 0 20px var(--g-yellow); }
-        .app:nth-child(4):hover { border-color: var(--g-green); box-shadow: 0 0 20px var(--g-green); }
+        .app:hover { background: var(--bizet-red); border-color: white; transform: translateY(-10px); box-shadow: 0 15px 30px rgba(255,0,0,0.4); }
 
-        /* --- 4. WEB LAYER & EXIT --- */
+        /* --- 6. WEB VIEW --- */
         #web-layer { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
-        #exit-bar { position: fixed; top: 15px; right: 15px; z-index: 99999; display: none; }
-        .exit-btn { padding: 10px 25px; background: var(--g-red); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
-
-        .off-anim { animation: off 0.6s forwards; }
-        @keyframes off { 50% { transform: scale(1.5, 0.005); } 100% { transform: scale(0); } }
+        .exit-pill { position: fixed; top: 18px; right: 25px; z-index: 99999; display: none; }
+        .exit-btn { padding: 12px 30px; background: #fff; color: #000; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="boot">
-        <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div>
-    </div>
+    <div id="bg-canvas"></div>
+    
+    <div id="boot"><div class="bizet-ball"></div></div>
 
     <div id="gate">
-        <h1 style="margin-bottom: 30px; letter-spacing: 5px;">BIZET OS READY</h1>
-        <button class="gate-btn" onclick="startSystem()">AYO MASUK KE FULLSCREEN</button>
-        <p style="margin-top: 20px; color: #555;">Klik tombol di atas untuk pengalaman layar penuh</p>
+        <h1 style="letter-spacing: 10px; margin-bottom: 40px;">BIZET PREMIUM OS</h1>
+        <button class="gate-btn" onclick="startOS()">AUTO FULLSCREEN</button>
     </div>
 
-    <div id="exit-bar"><button class="exit-btn" onclick="closeApp()">EXIT TO HOME</button></div>
+    <div id="dynamic-island">
+        <div class="island-txt" id="island-time">00:00</div>
+        <div style="width: 2px; height: 15px; background: #444;"></div>
+        <div class="island-txt" id="island-date" style="color: var(--bizet-red);">14 FEB</div>
+    </div>
+
+    <div class="exit-pill"><button class="exit-btn" onclick="closeApp()">EXIT</button></div>
 
     <div id="dashboard">
-        <h1 class="clock" id="cl">00:00</h1>
-        <p style="letter-spacing: 15px; color: #444;">ULTRA CHROMA v1.0</p>
+        <h1 class="main-clock" id="cl">00:00</h1>
         <div class="app-grid">
             <div class="app" onclick="openApp('https://www.tiktok.com')">TIKTOK</div>
             <div class="app" onclick="openApp('https://m.youtube.com')">YOUTUBE</div>
             <div class="app" onclick="openApp('https://poki.com')">GAMES</div>
             <div class="app" onclick="openApp('https://google.com')">GOOGLE</div>
             <div class="app" onclick="location.reload()">REBOOT</div>
-            <div class="app" onclick="alert('BIZET CHROMA\nFullscreen: Active\nVisual: Google Style')">INFO</div>
-            <div class="app" style="color:var(--g-red)" onclick="powerOff()">OFF</div>
+            <div class="app" onclick="alert('SYSTEM OK\nAUTO-FULLSCREEN: ACTIVE')">INFO</div>
+            <div class="app" style="color:var(--bizet-red)" onclick="location.href='about:blank'">OFF</div>
         </div>
     </div>
 
     <div id="web-layer"><iframe id="web-frame" src=""></iframe></div>
 
     <script>
-        // JAM
-        function clock() {
+        // UPDATE JAM & TANGGAL
+        function updateAllTime() {
             const d = new Date();
-            document.getElementById('cl').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            const timeStr = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            const months = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
+            const dateStr = d.getDate() + " " + months[d.getMonth()];
+            
+            document.getElementById('cl').innerText = timeStr;
+            document.getElementById('island-time').innerText = timeStr;
+            document.getElementById('island-date').innerText = dateStr;
         }
-        setInterval(clock, 1000); clock();
+        setInterval(updateAllTime, 1000); updateAllTime();
 
-        // FLOW SISTEM
+        // FULLSCREEN LOGIC (FIXED)
+        function forceFullscreen() {
+            const doc = document.documentElement;
+            if (!document.fullscreenElement) {
+                if (doc.requestFullscreen) doc.requestFullscreen();
+                else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
+            }
+        }
+
+        // DETEKSI PERUBAHAN LAYAR (BIAR GAK LEPAS FULLSCREEN)
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                console.log("Fullscreen lepas, memaksa masuk lagi...");
+            }
+        });
+
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('boot').style.display = 'none';
-                document.getElementById('gate').style.display = 'flex'; // Munculkan Gate
+                document.getElementById('gate').style.display = 'flex';
             }, 5000);
         };
 
-        function startSystem() {
-            // MINTA FULLSCREEN KE BROWSER TV
-            const doc = document.documentElement;
-            if (doc.requestFullscreen) doc.requestFullscreen();
-            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
-            
-            // Masuk Dashboard
+        function startOS() {
+            forceFullscreen();
             document.getElementById('gate').style.display = 'none';
             document.getElementById('dashboard').style.opacity = '1';
+            document.getElementById('dynamic-island').style.display = 'flex';
         }
 
         function openApp(url) {
+            forceFullscreen(); // Pastikan tetap fullscreen saat buka web
             document.getElementById('web-frame').src = url;
             document.getElementById('web-layer').style.display = 'block';
-            document.getElementById('exit-bar').style.display = 'block';
+            document.querySelector('.exit-pill').style.display = 'block';
             document.getElementById('dashboard').style.opacity = '0';
         }
 
         function closeApp() {
             document.getElementById('web-layer').style.display = 'none';
             document.getElementById('web-frame').src = '';
-            document.getElementById('exit-bar').style.display = 'none';
+            document.querySelector('.exit-pill').style.display = 'none';
             document.getElementById('dashboard').style.opacity = '1';
+            forceFullscreen();
         }
 
-        function powerOff() {
-            document.body.classList.add('off-anim');
-            setTimeout(() => { document.body.innerHTML = ''; }, 600);
-        }
+        // BACK BUTTON REMOT
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' || e.key === 'Escape') {
+                if(document.getElementById('web-layer').style.display === 'block') closeApp();
+            }
+        });
     </script>
 </body>
 </html>
