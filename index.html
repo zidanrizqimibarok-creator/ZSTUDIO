@@ -2,132 +2,199 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>BIZET OS v20.0 CIPHER EDITION</title>
+    <title>BIZET OS v21.0 CHROMA</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        :root { --red: #ff0000; --dark: #000; --neon: 0 0 30px rgba(255, 0, 0, 0.7); }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root {
+            --red: #ff0000;
+            --dark: #050505;
+            --glow: 0 0 30px rgba(255, 0, 0, 0.4);
+            --glass: rgba(255, 255, 255, 0.07);
+        }
 
-        /* BOOTING CLEAN */
-        #boot { position: fixed; inset: 0; background: #000; z-index: 999999; display: flex; justify-content: center; align-items: center; }
-        .logo { font-size: 8rem; font-weight: 900; color: var(--red); letter-spacing: 25px; text-shadow: var(--neon); animation: pulse 3s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1); } }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; color: white;
+            font-family: 'Segoe UI', sans-serif; overflow: hidden;
+        }
+
+        /* ANIMATED CHROMA BACKGROUND */
+        .bg-animate {
+            position: fixed; inset: 0;
+            background: linear-gradient(125deg, #050505, #1a0000, #050505, #250000);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            z-index: -1;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* CLEAN BOOT */
+        #boot {
+            position: fixed; inset: 0; background: #000; z-index: 999999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .logo-v21 {
+            font-size: 9rem; font-weight: 900; color: var(--red);
+            letter-spacing: 30px; text-shadow: var(--glow);
+            filter: blur(10px); opacity: 0;
+            animation: bootAnim 4s forwards;
+        }
+        @keyframes bootAnim {
+            50% { filter: blur(0); opacity: 1; transform: scale(1); }
+            100% { filter: blur(20px); opacity: 0; transform: scale(1.1); }
+        }
+
+        /* PAIRING PANEL (UPGRADED) */
+        #pair-panel {
+            position: fixed; top: 40px; right: 40px;
+            background: var(--glass); padding: 25px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px);
+            z-index: 1000; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .pair-label { font-size: 0.7rem; letter-spacing: 3px; color: #aaa; margin-bottom: 8px; }
+        .pair-code { font-family: 'Courier New', monospace; font-size: 2.5rem; color: var(--red); font-weight: 900; text-shadow: var(--glow); margin: 5px 0; }
+        #status-dot { display: inline-block; width: 10px; height: 10px; background: #555; border-radius: 50%; margin-right: 8px; }
 
         /* DASHBOARD */
-        #home-layer { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; padding: 0 8%; transition: 1s; }
-        .clock { font-size: 10rem; font-weight: 100; margin: 0; }
-        .welcome { font-size: 1.5rem; letter-spacing: 10px; color: #444; text-transform: uppercase; }
+        #dashboard {
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; padding-left: 10%;
+            transition: 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .clock { font-size: 11rem; font-weight: 100; margin: 0; letter-spacing: -5px; }
+        .welcome-text { font-size: 1.5rem; letter-spacing: 15px; color: #888; text-transform: uppercase; margin-top: -20px; }
+
+        /* PERSISTENT APP BAR (FLOATING) */
+        #app-bar {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 20px; z-index: 10000;
+            background: rgba(10,10,10,0.8); padding: 15px 30px;
+            border-radius: 100px; border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px); transition: 0.5s;
+        }
+        .app-item {
+            width: 140px; height: 75px; background: var(--glass);
+            border-radius: 20px; display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
+            border: 1px solid transparent; letter-spacing: 2px;
+        }
+        .app-item:hover {
+            background: var(--red); transform: translateY(-15px);
+            box-shadow: 0 15px 30px rgba(255,0,0,0.4); border-color: white;
+        }
 
         /* WEB LAYER */
-        #web-layer { position: absolute; inset: 0; z-index: 5; background: #000; display: none; }
+        #web-view { position: fixed; inset: 0; background: #000; z-index: 500; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* FLOATING UI (PINTASAN) */
-        #floating-ui {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 99999; display: flex; gap: 15px; background: rgba(10,10,10,0.95);
-            padding: 12px 30px; border-radius: 50px; border: 1px solid #333; backdrop-filter: blur(20px);
-        }
-        .btn-app { width: 120px; height: 65px; background: #1a1a1a; border-radius: 18px; border: 1px solid #444; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.75rem; letter-spacing: 1px; }
-        .btn-app:hover { background: var(--red); box-shadow: var(--neon); border-color: #fff; }
-
-        /* PAIRING CODE OVERLAY (PENGGANTI QR) */
-        #pairing-box {
-            position: fixed; top: 30px; right: 30px; background: rgba(20,20,20,0.9);
-            padding: 20px; border-radius: 20px; border: 1px solid #444; z-index: 100000;
-            text-align: center; backdrop-filter: blur(10px);
-        }
-        .code-text { font-family: monospace; font-size: 2rem; color: var(--red); font-weight: bold; letter-spacing: 5px; margin: 10px 0; }
-
-        /* SHUTDOWN */
-        .off-anim { animation: off 0.6s forwards; }
-        @keyframes off { 0% { transform: scale(1); } 50% { transform: scale(1.5, 0.002); filter: brightness(10); } 100% { opacity: 0; } }
+        /* SHUTDOWN EFF */
+        .crt-shutdown { animation: crt 0.6s forwards; }
+        @keyframes crt { 0% { transform: scale(1); } 50% { transform: scale(1.5, 0.005); filter: brightness(5); } 100% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="boot"><div class="logo">BIZET</div></div>
+    <div class="bg-animate"></div>
+    <div id="boot"><div class="logo-v21">BIZET</div></div>
 
-    <div id="pairing-box">
-        <div style="font-size: 0.7rem; color: #888; letter-spacing: 2px;">CONNECT CODE:</div>
-        <div class="code-text" id="sync-code">....</div>
-        <div id="conn-status" style="font-size: 0.6rem; color: #444;">WAITING...</div>
+    <div id="pair-panel">
+        <div class="pair-label">REMOTE PAIRING</div>
+        <div class="pair-code" id="code-val">....</div>
+        <div style="font-size: 0.6rem;"><span id="status-dot"></span><span id="status-text">DISCONNECTED</span></div>
     </div>
 
-    <div id="home-layer">
-        <p class="welcome">Apex Eternal v20</p>
+    <div id="dashboard">
         <h1 class="clock" id="cl">00:00</h1>
+        <p class="welcome-text">Apex Eternal Chroma</p>
     </div>
 
-    <div id="web-layer"><iframe id="ifr" src=""></iframe></div>
+    <div id="web-view"><iframe id="ifr" src=""></iframe></div>
 
-    <div id="floating-ui">
-        <div class="btn-app" onclick="openA('https://www.tiktok.com')">TIKTOK</div>
-        <div class="btn-app" onclick="openA('https://m.youtube.com')">YOUTUBE</div>
-        <div class="btn-app" onclick="openA('https://poki.com')">GAMES</div>
-        <div class="btn-app" style="border-color: red;" onclick="off()">OFF</div>
+    <div id="app-bar">
+        <div class="app-item" onclick="launch('https://www.tiktok.com')">TIKTOK</div>
+        <div class="app-item" onclick="launch('https://m.youtube.com')">YOUTUBE</div>
+        <div class="app-item" onclick="launch('https://poki.com')">GAMES</div>
+        <div class="app-item" style="color:red; font-weight:900;" onclick="shutdown()">OFF</div>
     </div>
 
     <script>
+        // CONFIG FIREBASE
         const firebaseConfig = { databaseURL: "https://bizet-tv-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. GENERATE PAIRING CODE (Contoh: BZ-7788)
-        const myPairCode = "BZ-" + Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('sync-code').innerText = myPairCode;
+        // GENERATE CIPHER CODE (rmt_XXXX)
+        const myPin = "rmt_" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('code-val').innerText = myPin;
 
-        // 2. SISTEM JAM
-        function clock() {
+        // CLOCK
+        function updateTime() {
             const d = new Date();
             document.getElementById('cl').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
         }
-        setInterval(clock, 1000); clock();
+        setInterval(updateTime, 1000); updateTime();
 
-        // 3. BOOTING
+        // BOOTING
         setTimeout(() => {
             const b = document.getElementById('boot');
-            b.style.transition = '2s'; b.style.opacity = '0';
-            setTimeout(() => b.style.display = 'none', 2000);
-        }, 5000);
+            b.style.transition = '1.5s'; b.style.opacity = '0';
+            setTimeout(() => b.style.display = 'none', 1500);
+        }, 4000);
 
-        // 4. NAVIGATION
-        function openA(url) {
+        // SYSTEM LOGIC
+        function launch(url) {
             document.getElementById('ifr').src = url;
-            document.getElementById('web-layer').style.display = 'block';
-            document.getElementById('home-layer').style.opacity = '0';
+            document.getElementById('web-view').style.display = 'block';
+            document.getElementById('dashboard').style.opacity = '0';
+            document.getElementById('app-bar').style.opacity = '0.3'; // Meredup saat di web
         }
 
-        function off() {
-            document.body.classList.add('off-anim');
+        function home() {
+            document.getElementById('web-view').style.display = 'none';
+            document.getElementById('ifr').src = '';
+            document.getElementById('dashboard').style.opacity = '1';
+            document.getElementById('app-bar').style.opacity = '1';
+        }
+
+        function shutdown() {
+            document.body.classList.add('crt-shutdown');
             setTimeout(() => { document.body.innerHTML = ''; }, 600);
         }
 
-        // 5. RECEIVER (Hanya jalan jika kode di Remote HP COCOK)
-        db.ref('BIZET_GLOBAL_SYNC').on('value', (snap) => {
+        // --- GLOBAL SYNC RECEIVER ---
+        db.ref('BIZET_V21_LINK').on('value', (snap) => {
             const data = snap.val();
             if(!data) return;
 
-            // CEK APAKAH KODE DARI HP SAMA DENGAN DI TV
-            if(data.pairKey === myPairCode) {
-                document.getElementById('conn-status').innerText = "CONNECTED";
-                document.getElementById('conn-status').style.color = "lime";
+            // CEK PAIRING PIN
+            if(data.pin === myPin) {
+                // Feedback visual di TV kalau sukses konek
+                document.getElementById('status-dot').style.background = 'lime';
+                document.getElementById('status-dot').style.boxShadow = '0 0 10px lime';
+                document.getElementById('status-text').innerText = "CONNECTED";
+                document.getElementById('status-text').style.color = "lime";
 
                 if(data.type === 'nav') {
                     if(data.val === 'UP') window.scrollBy(0, -300);
                     if(data.val === 'DOWN') window.scrollBy(0, 300);
-                    if(data.val === 'HOME') {
-                        document.getElementById('web-layer').style.display = 'none';
-                        document.getElementById('ifr').src = '';
-                        document.getElementById('home-layer').style.opacity = '1';
-                    }
+                    if(data.val === 'HOME') home();
+                    if(data.val === 'BACK') { try { document.getElementById('ifr').contentWindow.history.back(); } catch(e) { home(); } }
                 }
-                if(data.type === 'url') openA(data.val);
+                if(data.type === 'url') launch(data.val);
                 
-                // Clear trigger setelah diproses
-                db.ref('BIZET_GLOBAL_SYNC').set(null);
+                // Clear trigger
+                setTimeout(() => db.ref('BIZET_V21_LINK').set(null), 500);
             }
+        });
+
+        // Tampilkan Bar saat mouse ke bawah
+        window.addEventListener('mousemove', (e) => {
+            if(e.clientY > window.innerHeight - 100) document.getElementById('app-bar').style.opacity = '1';
         });
     </script>
 </body>
