@@ -2,166 +2,101 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>BIZET OS v1.0 LIGHTSPEED</title>
+    <title>BIZET OS v1.0 DIRECT</title>
     <style>
         :root {
             --bizet-red: #ff0000;
-            --v-blue: #007cf0;
-            --v-purple: #7928ca;
-            --grid-cols: 4;
+            --bg-dark: #050505;
         }
 
-        /* --- OPTIMASI DASAR --- */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #050505; color: white;
+            background: var(--bg-dark); color: white;
             font-family: 'Segoe UI', sans-serif; overflow: hidden;
-            cursor: default;
         }
 
-        /* --- LIGHTWEIGHT VIBRANT WALLPAPER --- */
+        /* WALLPAPER VIBRANT RINGAN */
         #bg {
             position: fixed; inset: 0; z-index: -1;
-            background: linear-gradient(135deg, #050505 0%, #1a0000 50%, #00001a 100%);
+            background: radial-gradient(circle at top right, #1a0000, #000);
         }
 
-        /* --- LIGHT BOOTING (ANTI-CRASH) --- */
+        /* BOOTING SUPER RINGAN */
         #boot {
             position: fixed; inset: 0; background: #000; z-index: 10000;
             display: flex; justify-content: center; align-items: center;
         }
-        .boot-text {
-            font-size: 5rem; font-weight: 900; letter-spacing: 20px;
-            color: var(--bizet-red); animation: simpleFade 3s forwards;
-            text-shadow: 0 0 20px rgba(255,0,0,0.5);
+        .boot-txt {
+            font-size: 5rem; font-weight: 900; color: var(--bizet-red);
+            letter-spacing: 15px; animation: pulse 2.5s forwards;
         }
-        @keyframes simpleFade {
-            0% { opacity: 0; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1); }
-        }
+        @keyframes pulse { 0% { opacity:0; } 50% { opacity:1; } 100% { opacity:0; } }
 
-        /* --- HOME UI --- */
-        #dashboard {
+        /* HOME UI */
+        #main {
             height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; opacity: 0; transition: 0.8s;
+            justify-content: center; align-items: center; text-align: center;
         }
-        .main-clock { font-size: 9rem; font-weight: 900; margin: 0; letter-spacing: -5px; }
-        .main-date { font-size: 1.2rem; color: #888; letter-spacing: 4px; margin-top: -10px; }
+        .clock { font-size: 8rem; font-weight: 900; margin: 0; }
+        .date { font-size: 1.2rem; color: #888; letter-spacing: 3px; margin-bottom: 30px; }
 
-        #app-grid { 
-            display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr); 
-            gap: 15px; margin-top: 30px; width: 85%; 
+        /* GRID SISTEM */
+        .grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 15px; width: 80%; max-width: 1000px;
         }
-        .app-list { display: flex; flex-direction: column; gap: 10px; width: 60%; }
-
         .app {
-            height: 100px; border-radius: 15px; background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: center;
-            align-items: center; font-weight: bold; cursor: pointer; transition: 0.2s;
+            height: 100px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+            text-decoration: none; color: white;
         }
-        .app:hover { background: var(--bizet-red); transform: scale(1.03); }
+        .app:hover { background: var(--bizet-red); transform: scale(1.05); }
 
-        /* --- DYNAMIC ISLAND (LIGHT ANIMATION) --- */
-        #island {
-            position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
-            background: #000; padding: 8px 30px; border-radius: 50px;
-            display: flex; align-items: center; gap: 15px; z-index: 99999;
-            border: 1px solid #333; transition: 0.5s ease;
-        }
-        #island.active { top: 15px; }
-
-        /* FULLSCREEN GATE */
+        /* GATE SCREEN */
         #gate {
             position: fixed; inset: 0; background: #000; z-index: 9000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        .gate-btn {
-            padding: 20px 60px; font-size: 1.5rem; font-weight: 900; background: var(--bizet-red);
-            border: none; color: white; border-radius: 10px; cursor: pointer;
-        }
-
-        /* WEB VIEW */
-        #web-layer { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .nav-pill { position: fixed; top: 10px; right: 20px; z-index: 999999; display: none; gap: 10px; }
-
-        /* SETTINGS */
-        #settings-menu {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000000;
-            display: none; justify-content: center; align-items: center;
-        }
-        .set-card { width: 400px; background: #111; border-radius: 20px; padding: 30px; border: 1px solid #333; text-align: center; }
-        .set-btn { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .btn { padding: 20px 50px; background: var(--bizet-red); border: none; color: white; font-weight: 900; border-radius: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="bg"></div>
-    
-    <div id="boot"><div class="boot-text">BIZET</div></div>
+
+    <div id="boot"><div class="boot-txt">BIZET</div></div>
 
     <div id="gate">
-        <button class="gate-btn" onclick="startOS()">KLIK UNTUK FULLSCREEN</button>
+        <button class="btn" onclick="goFull()">START BIZET OS (AUTO FULLSCREEN)</button>
     </div>
 
-    <div id="island">
-        <span id="isl-time" style="font-weight:bold;">00:00</span>
-        <span id="isl-date" style="color:var(--bizet-red); font-size: 0.8rem;">14 FEB 2026</span>
-    </div>
+    <div id="main">
+        <h1 class="clock" id="c">00:00</h1>
+        <p class="date" id="d">SABTU, 14 FEB 2026</p>
 
-    <div class="nav-pill">
-        <button onclick="closeApp()" style="padding:10px 20px; border-radius:5px; border:none; background:red; color:white; font-weight:bold;">EXIT</button>
-        <button onclick="openSettings()" style="padding:10px 20px; border-radius:5px; border:none; background:white; font-weight:bold;">SET</button>
-    </div>
-
-    <div id="dashboard">
-        <h1 class="main-clock" id="cl">00:00</h1>
-        <p class="main-date" id="full-date">SABTU, 14 FEB 2026</p>
-        
-        <div id="app-grid" class="app-grid">
-            <div class="app" onclick="openApp('https://www.tiktok.com')">TIKTOK</div>
-            <div class="app" onclick="openApp('https://m.youtube.com')">YOUTUBE</div>
-            <div class="app" onclick="openApp('https://poki.com')">GAMES</div>
-            <div class="app" onclick="openApp('https://dutamovie21.ink')">DUTAMOVIE21</div>
-            <div class="app" onclick="openApp('https://google.com')">GOOGLE</div>
-            <div class="app" onclick="openSettings()">SETTINGS</div>
+        <div class="grid">
+            <a href="https://www.tiktok.com" class="app">TIKTOK</a>
+            <a href="https://m.youtube.com" class="app">YOUTUBE</a>
+            <a href="https://poki.com" class="app">GAMES</a>
+            <a href="https://dutamovie21.ink" class="app">DUTAMOVIE21</a>
+            <a href="https://www.google.com" class="app">GOOGLE</a>
             <div class="app" onclick="location.reload()">REBOOT</div>
-            <div class="app" style="color:red" onclick="location.href='about:blank'">OFF</div>
+            <div class="app" onclick="alert('BIZET OS v1.0\nStatus: Direct Link Mode')">INFO</div>
+            <div class="app" style="color:red" onclick="window.close()">OFF</div>
         </div>
     </div>
-
-    <div id="settings-menu">
-        <div class="set-card">
-            <h3>SETTING LAYOUT</h3>
-            <button class="set-btn" onclick="changeUI('grid')">GRID VIEW (BOX)</button>
-            <button class="set-btn" onclick="changeUI('list')">LIST VIEW (BARIS)</button>
-            <button class="set-btn" style="background:red; color:white;" onclick="fixFS()">LOCK FULLSCREEN</button>
-            <button class="set-btn" onclick="closeSettings()">CLOSE</button>
-        </div>
-    </div>
-
-    <div id="web-layer"><iframe id="web-frame" src=""></iframe></div>
 
     <script>
-        function updateAll() {
+        function update() {
             const d = new Date();
             const days = ["MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
             const months = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
-            const t = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-            const dStr = days[d.getDay()] + ", " + d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
-            document.getElementById('cl').innerText = t;
-            document.getElementById('isl-time').innerText = t;
-            document.getElementById('full-date').innerText = dStr;
-            document.getElementById('isl-date').innerText = d.getDate() + " " + months[d.getMonth()];
+            document.getElementById('c').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            document.getElementById('d').innerText = days[d.getDay()] + ", " + d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
         }
-        setInterval(updateAll, 1000); updateAll();
-
-        function fixFS() {
-            const doc = document.documentElement;
-            if (doc.requestFullscreen) doc.requestFullscreen();
-            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
-        }
+        setInterval(update, 1000); update();
 
         window.onload = () => {
             setTimeout(() => {
@@ -170,37 +105,12 @@
             }, 3000);
         };
 
-        function startOS() {
-            fixFS();
+        function goFull() {
+            const doc = document.documentElement;
+            if (doc.requestFullscreen) doc.requestFullscreen();
+            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
             document.getElementById('gate').style.display = 'none';
-            document.getElementById('dashboard').style.opacity = '1';
         }
-
-        function openApp(url) {
-            fixFS();
-            document.getElementById('web-frame').src = url;
-            document.getElementById('web-layer').style.display = 'block';
-            document.querySelector('.nav-pill').style.display = 'flex';
-            document.getElementById('island').classList.add('active');
-            document.getElementById('dashboard').style.opacity = '0';
-        }
-
-        function closeApp() {
-            document.getElementById('web-layer').style.display = 'none';
-            document.getElementById('web-frame').src = '';
-            document.querySelector('.nav-pill').style.display = 'none';
-            document.getElementById('island').classList.remove('active');
-            document.getElementById('dashboard').style.opacity = '1';
-        }
-
-        function changeUI(type) {
-            const grid = document.getElementById('app-grid');
-            grid.className = (type === 'list') ? 'app-list' : 'app-grid';
-            closeSettings();
-        }
-
-        function openSettings() { document.getElementById('settings-menu').style.display = 'flex'; }
-        function closeSettings() { document.getElementById('settings-menu').style.display = 'none'; }
     </script>
 </body>
 </html>
