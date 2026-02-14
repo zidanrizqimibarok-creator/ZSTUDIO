@@ -2,15 +2,13 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>BIZET OS v21.0 CHROMA</title>
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+    <title>BIZET OS v22.0 ULTRA NATIVE</title>
     <style>
         :root {
             --red: #ff0000;
-            --dark: #050505;
-            --glow: 0 0 30px rgba(255, 0, 0, 0.4);
-            --glass: rgba(255, 255, 255, 0.07);
+            --glass: rgba(0, 0, 0, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --focus-glow: 0 0 40px rgba(255, 0, 0, 0.8);
         }
 
         body, html {
@@ -19,182 +17,160 @@
             font-family: 'Segoe UI', sans-serif; overflow: hidden;
         }
 
-        /* ANIMATED CHROMA BACKGROUND */
-        .bg-animate {
-            position: fixed; inset: 0;
-            background: linear-gradient(125deg, #050505, #1a0000, #050505, #250000);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            z-index: -1;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* CLEAN BOOT */
+        /* --- 1. BOOTING PARTIKEL --- */
         #boot {
-            position: fixed; inset: 0; background: #000; z-index: 999999;
+            position: fixed; inset: 0; background: #000; z-index: 10000;
             display: flex; justify-content: center; align-items: center;
         }
-        .logo-v21 {
-            font-size: 9rem; font-weight: 900; color: var(--red);
-            letter-spacing: 30px; text-shadow: var(--glow);
-            filter: blur(10px); opacity: 0;
-            animation: bootAnim 4s forwards;
+        .logo-apex {
+            font-size: 8rem; font-weight: 900; color: var(--red);
+            letter-spacing: 20px; animation: bootFade 4s forwards;
         }
-        @keyframes bootAnim {
-            50% { filter: blur(0); opacity: 1; transform: scale(1); }
-            100% { filter: blur(20px); opacity: 0; transform: scale(1.1); }
+        @keyframes bootFade {
+            0% { opacity: 0; transform: scale(0.8); filter: blur(20px); }
+            50% { opacity: 1; transform: scale(1); filter: blur(0px); }
+            100% { opacity: 0; transform: scale(1.1); filter: blur(20px); }
         }
 
-        /* PAIRING PANEL (UPGRADED) */
-        #pair-panel {
-            position: fixed; top: 40px; right: 40px;
-            background: var(--glass); padding: 25px; border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px);
-            z-index: 1000; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        /* --- 2. DYNAMIC WALLPAPER --- */
+        #bg-container {
+            position: fixed; inset: 0; z-index: -1;
+            background: url('https://source.unsplash.com/1920x1080/?nature,dark,space') no-repeat center center/cover;
+            transition: 2s ease-in-out; filter: brightness(0.4);
         }
-        .pair-label { font-size: 0.7rem; letter-spacing: 3px; color: #aaa; margin-bottom: 8px; }
-        .pair-code { font-family: 'Courier New', monospace; font-size: 2.5rem; color: var(--red); font-weight: 900; text-shadow: var(--glow); margin: 5px 0; }
-        #status-dot { display: inline-block; width: 10px; height: 10px; background: #555; border-radius: 50%; margin-right: 8px; }
 
-        /* DASHBOARD */
+        /* --- 3. DASHBOARD --- */
         #dashboard {
-            height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; padding-left: 10%;
-            transition: 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            height: 100vh; padding: 0 8%; display: flex; flex-direction: column;
+            justify-content: center; transition: 0.8s;
         }
-        .clock { font-size: 11rem; font-weight: 100; margin: 0; letter-spacing: -5px; }
-        .welcome-text { font-size: 1.5rem; letter-spacing: 15px; color: #888; text-transform: uppercase; margin-top: -20px; }
-
-        /* PERSISTENT APP BAR (FLOATING) */
-        #app-bar {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 20px; z-index: 10000;
-            background: rgba(10,10,10,0.8); padding: 15px 30px;
-            border-radius: 100px; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px); transition: 0.5s;
-        }
+        .clock { font-size: 10rem; font-weight: 100; margin: 0; letter-spacing: -5px; }
+        
+        /* APP GRID (NATIVE FOCUS) */
+        .app-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; margin-top: 50px; }
         .app-item {
-            width: 140px; height: 75px; background: var(--glass);
-            border-radius: 20px; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
-            border: 1px solid transparent; letter-spacing: 2px;
+            background: var(--glass); border: 2px solid var(--border);
+            height: 130px; border-radius: 25px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; cursor: pointer;
+            transition: 0.3s; outline: none;
         }
-        .app-item:hover {
-            background: var(--red); transform: translateY(-15px);
-            box-shadow: 0 15px 30px rgba(255,0,0,0.4); border-color: white;
+        /* EFEK SAAT DIPILIH PAKAI REMOT (FOCUS) */
+        .app-item:focus {
+            border-color: var(--red); transform: scale(1.1);
+            background: rgba(255, 0, 0, 0.1); box-shadow: var(--focus-glow);
         }
+        .app-item b { font-size: 0.9rem; letter-spacing: 2px; margin-top: 10px; }
 
-        /* WEB LAYER */
-        #web-view { position: fixed; inset: 0; background: #000; z-index: 500; display: none; }
+        /* --- 4. SETTINGS MENU --- */
+        #settings-ui {
+            position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.95);
+            display: none; justify-content: center; align-items: center;
+        }
+        .set-window { width: 800px; height: 500px; background: #111; border-radius: 40px; border: 1px solid #333; display: flex; }
+        .set-nav { width: 30%; border-right: 1px solid #222; padding: 40px 20px; }
+        .set-content { flex: 1; padding: 50px; }
+        .set-item { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 15px; background: #1a1a1a; color: white; border: none; text-align: left; cursor: pointer; }
+        .set-item:focus { background: var(--red); outline: none; box-shadow: 0 0 20px rgba(255,0,0,0.4); }
+
+        /* --- 5. WEB LAYER --- */
+        #web-layer { position: fixed; inset: 0; background: #000; z-index: 500; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* SHUTDOWN EFF */
-        .crt-shutdown { animation: crt 0.6s forwards; }
-        @keyframes crt { 0% { transform: scale(1); } 50% { transform: scale(1.5, 0.005); filter: brightness(5); } 100% { opacity: 0; } }
+        /* SHUTDOWN */
+        .off-anim { animation: off 0.7s forwards; }
+        @keyframes off { 50% { transform: scale(1.2, 0.005); filter: brightness(10); } 100% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="bg-animate"></div>
-    <div id="boot"><div class="logo-v21">BIZET</div></div>
-
-    <div id="pair-panel">
-        <div class="pair-label">REMOTE PAIRING</div>
-        <div class="pair-code" id="code-val">....</div>
-        <div style="font-size: 0.6rem;"><span id="status-dot"></span><span id="status-text">DISCONNECTED</span></div>
-    </div>
+    <div id="bg-container"></div>
+    <div id="boot"><div class="logo-apex">BIZET</div></div>
 
     <div id="dashboard">
         <h1 class="clock" id="cl">00:00</h1>
-        <p class="welcome-text">Apex Eternal Chroma</p>
+        <p style="letter-spacing: 10px; color: #888;">APEX ULTRA v22</p>
+
+        <div class="app-grid">
+            <div class="app-item" tabindex="1" onclick="launch('https://www.tiktok.com')"><b>TIKTOK</b></div>
+            <div class="app-item" tabindex="2" onclick="launch('https://m.youtube.com')"><b>YOUTUBE</b></div>
+            <div class="app-item" tabindex="3" onclick="launch('https://www.netflix.com')"><b>NETFLIX</b></div>
+            <div class="app-item" tabindex="4" onclick="launch('https://www.spotify.com')"><b>SPOTIFY</b></div>
+            <div class="app-item" tabindex="5" onclick="toggleSet()"><b>SETTINGS</b></div>
+            <div class="app-item" tabindex="6" style="border-color: #400;" onclick="off()"><b>OFF</b></div>
+        </div>
     </div>
 
-    <div id="web-view"><iframe id="ifr" src=""></iframe></div>
+    <div id="web-layer"><iframe id="ifr" src=""></iframe></div>
 
-    <div id="app-bar">
-        <div class="app-item" onclick="launch('https://www.tiktok.com')">TIKTOK</div>
-        <div class="app-item" onclick="launch('https://m.youtube.com')">YOUTUBE</div>
-        <div class="app-item" onclick="launch('https://poki.com')">GAMES</div>
-        <div class="app-item" style="color:red; font-weight:900;" onclick="shutdown()">OFF</div>
+    <div id="settings-ui">
+        <div class="set-window">
+            <div class="set-nav">
+                <button class="set-item" tabindex="7" onclick="closeSet()">KEMBALI</button>
+                <button class="set-item" tabindex="8" onclick="changeWall()">GANTI WALLPAPER</button>
+                <button class="set-item" tabindex="9" onclick="location.reload()">REBOOT</button>
+            </div>
+            <div class="set-content">
+                <h2 style="color:red">SYSTEM SETTINGS</h2>
+                <hr style="border:0; border-top:1px solid #222;">
+                <p>Model: Polytron Smart BIZET Edition</p>
+                <p>Memory: 2.4GB / 4.0GB Available</p>
+                <p>OS Status: Optimized (No Remote Required)</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // CONFIG FIREBASE
-        const firebaseConfig = { databaseURL: "https://bizet-tv-default-rtdb.firebaseio.com" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // GENERATE CIPHER CODE (rmt_XXXX)
-        const myPin = "rmt_" + Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('code-val').innerText = myPin;
-
-        // CLOCK
-        function updateTime() {
+        // 1. CLOCK
+        function updateClock() {
             const d = new Date();
             document.getElementById('cl').innerText = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
         }
-        setInterval(updateTime, 1000); updateTime();
+        setInterval(updateClock, 1000); updateClock();
 
-        // BOOTING
+        // 2. BOOTING
         setTimeout(() => {
             const b = document.getElementById('boot');
-            b.style.transition = '1.5s'; b.style.opacity = '0';
-            setTimeout(() => b.style.display = 'none', 1500);
-        }, 4000);
+            b.style.transition = '2s'; b.style.opacity = '0';
+            setTimeout(() => { b.style.display = 'none'; document.querySelector('.app-item').focus(); }, 2000);
+        }, 5000);
 
-        // SYSTEM LOGIC
+        // 3. NAVIGATION
         function launch(url) {
             document.getElementById('ifr').src = url;
-            document.getElementById('web-view').style.display = 'block';
+            document.getElementById('web-layer').style.display = 'block';
             document.getElementById('dashboard').style.opacity = '0';
-            document.getElementById('app-bar').style.opacity = '0.3'; // Meredup saat di web
         }
 
-        function home() {
-            document.getElementById('web-view').style.display = 'none';
-            document.getElementById('ifr').src = '';
-            document.getElementById('dashboard').style.opacity = '1';
-            document.getElementById('app-bar').style.opacity = '1';
+        function closeSet() {
+            document.getElementById('settings-ui').style.display = 'none';
+            document.querySelector('.app-item').focus();
         }
 
-        function shutdown() {
-            document.body.classList.add('crt-shutdown');
-            setTimeout(() => { document.body.innerHTML = ''; }, 600);
+        function toggleSet() {
+            document.getElementById('settings-ui').style.display = 'flex';
+            document.querySelector('.set-item').focus();
         }
 
-        // --- GLOBAL SYNC RECEIVER ---
-        db.ref('BIZET_V21_LINK').on('value', (snap) => {
-            const data = snap.val();
-            if(!data) return;
+        function changeWall() {
+            const bg = document.getElementById('bg-container');
+            bg.style.backgroundImage = `url('https://source.unsplash.com/1920x1080/?space,abstract,dark&sig=${Math.random()}')`;
+        }
 
-            // CEK PAIRING PIN
-            if(data.pin === myPin) {
-                // Feedback visual di TV kalau sukses konek
-                document.getElementById('status-dot').style.background = 'lime';
-                document.getElementById('status-dot').style.boxShadow = '0 0 10px lime';
-                document.getElementById('status-text').innerText = "CONNECTED";
-                document.getElementById('status-text').style.color = "lime";
+        function off() {
+            document.body.classList.add('off-anim');
+            setTimeout(() => { document.body.innerHTML = ''; }, 700);
+        }
 
-                if(data.type === 'nav') {
-                    if(data.val === 'UP') window.scrollBy(0, -300);
-                    if(data.val === 'DOWN') window.scrollBy(0, 300);
-                    if(data.val === 'HOME') home();
-                    if(data.val === 'BACK') { try { document.getElementById('ifr').contentWindow.history.back(); } catch(e) { home(); } }
+        // 4. REMOTE BAWAAN TV (D-PAD CONTROL)
+        window.addEventListener('keydown', (e) => {
+            // Jika tombol 'Back' remot TV dipencet
+            if (e.key === 'Backspace' || e.key === 'Escape') {
+                if(document.getElementById('web-layer').style.display === 'block') {
+                    document.getElementById('web-layer').style.display = 'none';
+                    document.getElementById('ifr').src = '';
+                    document.getElementById('dashboard').style.opacity = '1';
                 }
-                if(data.type === 'url') launch(data.val);
-                
-                // Clear trigger
-                setTimeout(() => db.ref('BIZET_V21_LINK').set(null), 500);
             }
-        });
-
-        // Tampilkan Bar saat mouse ke bawah
-        window.addEventListener('mousemove', (e) => {
-            if(e.clientY > window.innerHeight - 100) document.getElementById('app-bar').style.opacity = '1';
         });
     </script>
 </body>
